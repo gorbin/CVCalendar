@@ -206,6 +206,22 @@ public final class CVCalendarMonthContentViewController: CVCalendarContentViewCo
         setDayOutViewsVisible(hidden)
     }
     
+    public override func reloadViews() {
+        reloadMonthViews()
+    }
+    
+    public override func getDaysView() -> [DayView] {
+        var days = [DayView]()
+        
+        for weekView in (monthViews[Presented]?.weekViews)! {
+            for day in weekView.dayViews {
+                days.append(day)
+            }
+        }
+    
+        return days
+    }
+
     private var togglingBlocked = false
     public override func togglePresentedDate(date: NSDate) {
         let presentedDate = Date(date: date)
@@ -347,9 +363,9 @@ extension CVCalendarMonthContentViewController {
                 }
             }
         }
-        
+
     }
-    
+
     public func selectDayViewWithDay(day: Int, inMonthView monthView: CVCalendarMonthView) {
         let coordinator = calendarView.coordinator
         monthView.mapDayViews { dayView in
@@ -357,7 +373,7 @@ extension CVCalendarMonthContentViewController {
                 if let selected = coordinator.selectedDayView where selected != dayView {
                     self.calendarView.didSelectDayView(dayView)
                 }
-                
+
                 coordinator.performDayViewSingleSelection(dayView)
             }
         }
@@ -371,21 +387,21 @@ extension CVCalendarMonthContentViewController {
         if scrollView.contentOffset.y != 0 {
             scrollView.contentOffset = CGPointMake(scrollView.contentOffset.x, 0)
         }
-        
+
         let page = Int(floor((scrollView.contentOffset.x - scrollView.frame.width / 2) / scrollView.frame.width) + 1)
         if currentPage != page {
             currentPage = page
         }
-        
+
         lastContentOffset = scrollView.contentOffset.x
     }
-    
+
     public func scrollViewWillBeginDragging(scrollView: UIScrollView) {
         if let presented = monthViews[Presented] {
             prepareTopMarkersOnMonthView(presented, hidden: true)
         }
     }
-    
+
     public func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
         if pageChanged {
             switch direction {
@@ -394,14 +410,14 @@ extension CVCalendarMonthContentViewController {
             default: break
             }
         }
-        
+
         updateSelection()
         updateLayoutIfNeeded()
         pageLoadingEnabled = true
         direction = .None
-        
+
     }
-    
+
     public func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         if decelerate {
             let rightBorder = scrollView.frame.width
@@ -411,7 +427,7 @@ extension CVCalendarMonthContentViewController {
                 direction = .Left
             }
         }
-        
+
         for monthView in monthViews.values {
             prepareTopMarkersOnMonthView(monthView, hidden: false)
         }

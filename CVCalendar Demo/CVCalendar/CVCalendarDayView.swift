@@ -9,6 +9,8 @@
 import UIKit
 
 public final class CVCalendarDayView: UIView {
+    
+    public var solved:Bool = false
     // MARK: - Public properties
     public let weekdayIndex: Int!
     public weak var weekView: CVCalendarWeekView!
@@ -22,7 +24,8 @@ public final class CVCalendarDayView: UIView {
     
     public var isOut = false
     public var isCurrentDay = false
-    
+    public var supView:UIView?
+
     public weak var monthView: CVCalendarMonthView! {
         get {
             var monthView: MonthView!
@@ -199,8 +202,9 @@ extension CVCalendarDayView {
     
     public func supplementarySetup() {
         if let delegate = calendarView.delegate, shouldShow = delegate.supplementaryView?(shouldDisplayOnDayView: self) where shouldShow {
-            if let supView = delegate.supplementaryView?(viewOnDayView: self) {
-                insertSubview(supView, atIndex: 0)
+            supView = delegate.supplementaryView?(viewOnDayView: self)
+            if supView != nil {
+                insertSubview(supView!, atIndex: 0)
             }
         }
     }
@@ -311,7 +315,7 @@ extension CVCalendarDayView {
                 func colorMarker() {
                     if let delegate = calendarView.delegate {
                         let appearance = calendarView.appearance
-                        let frame = dotMarker.frame
+                        //let frame = dotMarker.frame
                         var color: UIColor?
                         if unwinded {
                             if let myColor = delegate.dotMarker?(colorOnDayView: self) {
@@ -392,7 +396,7 @@ extension CVCalendarDayView {
     }
     
     public func moveView(view: UIView, onCircleView circleView: UIView, fromAngle angle: CGFloat, toAngle endAngle: CGFloat, straight: Bool) {
-        let condition = angle > endAngle ? angle > endAngle : angle < endAngle
+        //let condition = angle > endAngle ? angle > endAngle : angle < endAngle
         if straight && angle < endAngle || !straight && angle > endAngle {
             UIView.animateWithDuration(pow(10, -1000), delay: 0, usingSpringWithDamping: 0.4, initialSpringVelocity: 10, options: UIViewAnimationOptions.CurveEaseIn, animations: {
                 let angle = angle.toRadians()
@@ -416,21 +420,35 @@ extension CVCalendarDayView {
         var shape: CVShape!
         
         switch type {
-        case let .Single:
+        case .Single:
             shape = .Circle
             if isCurrentDay {
-                dayLabel?.textColor = appearance.dayLabelPresentWeekdaySelectedTextColor!
-                dayLabel?.font = appearance.dayLabelPresentWeekdaySelectedFont
-                backgroundColor = appearance.dayLabelPresentWeekdaySelectedBackgroundColor
-                backgroundAlpha = appearance.dayLabelPresentWeekdaySelectedBackgroundAlpha
+                if(solved){
+                    dayLabel?.textColor = appearance.dayLabelPresentWeekdaySelectedTextColor!
+                    dayLabel?.font = appearance.dayLabelPresentWeekdaySelectedFont
+                    backgroundColor = appearance.dayLabelPresentWeekdaySelectedBackgroundColor
+                    backgroundAlpha = appearance.dayLabelPresentWeekdaySelectedBackgroundAlpha
+                } else {
+                    dayLabel?.textColor = appearance.dayLabelPresentWeekdaySelectedTextColor!
+                    dayLabel?.font = appearance.dayLabelPresentWeekdaySelectedFont
+                    backgroundColor = appearance.dayLabelPresentWeekdaySelectedBackgroundColorSolved
+                    backgroundAlpha = appearance.dayLabelPresentWeekdaySelectedBackgroundAlphaSolved
+                }
             } else {
-                dayLabel?.textColor = appearance.dayLabelWeekdaySelectedTextColor
-                dayLabel?.font = appearance.dayLabelWeekdaySelectedFont
-                backgroundColor = appearance.dayLabelWeekdaySelectedBackgroundColor
-                backgroundAlpha = appearance.dayLabelWeekdaySelectedBackgroundAlpha
+                if(solved){
+                    dayLabel?.textColor = appearance.dayLabelWeekdaySelectedTextColor
+                    dayLabel?.font = appearance.dayLabelWeekdaySelectedFont
+                    backgroundColor = appearance.dayLabelWeekdaySelectedBackgroundColor
+                    backgroundAlpha = appearance.dayLabelWeekdaySelectedBackgroundAlpha
+                } else {
+                    dayLabel?.textColor = appearance.dayLabelWeekdaySelectedTextColor
+                    dayLabel?.font = appearance.dayLabelWeekdaySelectedFont
+                    backgroundColor = appearance.dayLabelWeekdaySelectedBackgroundColorSolved
+                    backgroundAlpha = appearance.dayLabelWeekdaySelectedBackgroundAlphaSolved
+                }
             }
-            
-        case let .Range:
+
+        case .Range:
             shape = .Rect
             if isCurrentDay {
                 dayLabel?.textColor = appearance.dayLabelPresentWeekdayHighlightedTextColor!
@@ -443,8 +461,8 @@ extension CVCalendarDayView {
                 backgroundColor = appearance.dayLabelWeekdayHighlightedBackgroundColor
                 backgroundAlpha = appearance.dayLabelWeekdayHighlightedBackgroundAlpha
             }
-            
-        default: break
+
+        //default: break
         }
         
         if let circleView = circleView where circleView.frame != dayLabel.bounds {
@@ -456,8 +474,8 @@ extension CVCalendarDayView {
         circleView!.fillColor = backgroundColor
         circleView!.alpha = backgroundAlpha
         circleView!.setNeedsDisplay()
-        insertSubview(circleView!, atIndex: 0)
-        
+        insertSubview(circleView!, belowSubview: dayLabel)
+
         moveDotMarkerBack(false, coloring: false)
     }
     
@@ -499,7 +517,14 @@ extension CVCalendarDayView {
 // MARK: - Content reload
 
 extension CVCalendarDayView {
+    
+    public func update(supColor:UIColor) {
+        supView?.backgroundColor = supColor
+    }
+    
     public func reloadContent() {
+        //supplementarySetup()
+        preliminarySetup()
         setupDotMarker()
         dayLabel?.frame = bounds
         

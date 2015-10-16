@@ -131,12 +131,70 @@ public final class CVCalendarMenuView: UIView {
             let y: CGFloat = 0
             
             for i in 0..<self.symbolViews!.count {
-                x = CGFloat(i) * width + space
-                
-                let frame = CGRectMake(x, y, width, height)
+                x = CGFloat(i) * width //+ space
+
+                let frame = CGRectMake(x, y, width+1, height)
                 let symbol = self.symbolViews![i]
                 symbol.frame = frame
             }
+        }
+    }
+    
+    public func updateView(colors:[[UIColor]]) {
+        for i in 0..<7 {
+            updateViewByIndex(i, backgroundColor: colors[i][0], textColor: colors[i][1])
+        }
+    }
+    
+    public func updateViewByIndex(index:Int, backgroundColor:UIColor, textColor:UIColor) {
+        symbolViews![index].backgroundColor = backgroundColor
+        symbolViews![index].textColor = textColor
+    }
+    
+    public func createDaySymbols(check:[Bool], color:UIColor, backgroundColor:UIColor) {
+        // Change symbols with their places if needed.
+        let dateFormatter = NSDateFormatter()
+        var weekdays = dateFormatter.shortWeekdaySymbols as NSArray
+        
+        let firstWeekdayIndex = firstWeekday!.rawValue - 1
+        if (firstWeekdayIndex > 0) {
+            let copy = weekdays
+            weekdays = (weekdays.subarrayWithRange(NSMakeRange(firstWeekdayIndex, 7 - firstWeekdayIndex)))
+            weekdays = weekdays.arrayByAddingObjectsFromArray(copy.subarrayWithRange(NSMakeRange(0, firstWeekdayIndex)))
+        }
+        
+        self.symbols = weekdays as! [String]
+        
+        // Add symbols.
+        self.symbolViews = [UILabel]()
+        let space = 1 as CGFloat
+        let width = self.frame.width / 7 - space
+        let height = self.frame.height
+        
+        var x: CGFloat = 0
+        let y: CGFloat = 0
+        
+        for i in 0..<7 {
+            x = CGFloat(i) * width + space
+            
+            let symbol = UILabel(frame: CGRectMake(x, y, width+1, height))
+            symbol.textAlignment = .Center
+            symbol.text = self.symbols[i]
+            
+            if (dayOfWeekTextUppercase!) {
+                symbol.text = (self.symbols[i]).uppercaseString
+            }
+            
+            symbol.font = dayOfWeekFont
+            symbol.textColor = dayOfWeekTextColor
+            if(check[i]){
+                symbol.backgroundColor = color
+            } else {
+                symbol.backgroundColor = backgroundColor
+            }
+            
+            self.symbolViews?.append(symbol)
+            self.addSubview(symbol)
         }
     }
 }

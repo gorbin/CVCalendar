@@ -14,7 +14,9 @@ public class CVCalendarContentViewController: UIViewController {
     public let Previous = "Previous"
     public let Presented = "Presented"
     public let Following = "Following"
-    
+    public let PreviousOut = "PreviousOut"
+    public let FollowingOut = "FollowingOut"
+
     // MARK: - Public Properties
     public let calendarView: CalendarView
     public let scrollView: UIScrollView
@@ -88,6 +90,11 @@ extension CVCalendarContentViewController {
     public func presentPreviousView(view: UIView?) { }
     
     public func updateDayViews(hidden: Bool) { }
+    
+    public func reloadViews() { }
+    
+    public func getDaysView() -> [DayView]? { return nil}
+    
 }
 
 // MARK: - Contsant conversion
@@ -99,6 +106,8 @@ extension CVCalendarContentViewController {
         case Previous: index = 0
         case Presented: index = 1
         case Following: index = 2
+        case PreviousOut: index = -2
+        case FollowingOut: index = -3
         default: index = -1
         }
         
@@ -139,6 +148,15 @@ extension CVCalendarContentViewController {
         return (lhs.year == rhs.year && lhs.month == rhs.month && lhs.week == rhs.week)
     }
     
+    public func matchedWeeksOnly(lhs: Date, _ rhs: Date) -> Bool {
+        return (lhs.year == rhs.year && lhs.week == rhs.week)
+    }
+    
+    public func matchedWeekMonthOnly(lhs: Date, _ rhs: Date) -> Bool {
+        return (lhs.year == rhs.year && lhs.month == rhs.month)
+    }
+
+
     public func matchedDays(lhs: Date, _ rhs: Date) -> Bool {
         return (lhs.year == rhs.year && lhs.month == rhs.month && lhs.day == rhs.day)
     }
