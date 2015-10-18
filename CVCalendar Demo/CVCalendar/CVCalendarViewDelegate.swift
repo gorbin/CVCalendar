@@ -18,6 +18,7 @@ public protocol CVCalendarViewDelegate {
     */
     optional func shouldAnimateResizing() -> Bool
     
+    optional func shouldScrollOnOutDayViewSelection() -> Bool
     optional func shouldAutoSelectDayOnWeekChange() -> Bool
     optional func shouldAutoSelectDayOnMonthChange() -> Bool
     optional func shouldShowWeekdaysOut() -> Bool
@@ -35,4 +36,7 @@ public protocol CVCalendarViewDelegate {
     
     optional func supplementaryView(viewOnDayView dayView: DayView) -> UIView
     optional func supplementaryView(shouldDisplayOnDayView dayView: DayView) -> Bool
+    
+    optional func didShowNextMonthView(date: NSDate)
+    optional func didShowPreviousMonthView(date: NSDate)
 }

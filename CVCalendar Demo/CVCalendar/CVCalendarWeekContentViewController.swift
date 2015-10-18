@@ -169,7 +169,8 @@ public final class CVCalendarWeekContentViewController: CVCalendarContentViewCon
     }
     public var same:Bool = false
     public override func performedDayViewSelection(dayView: DayView) {
-        if (dayView.isOut) {
+
+        if dayView.isOut && calendarView.shouldScrollOnOutDayViewSelection {
             if dayView.date.day > 20 {
                 let presentedDate = dayView.date //dayView.monthView.date
                 calendarView.presentedDate = presentedDate//Date(date: self.dateBeforeDate(presentedDate))

@@ -89,6 +89,7 @@ public final class CVCalendarMonthContentViewController: CVCalendarContentViewCo
                 replaceMonthView(following, withIdentifier: Presented, animatable: true)
                 
                 insertMonthView(getFollowingMonth(following.date), withIdentifier: Following)
+                self.calendarView.delegate?.didShowNextMonthView?(following.date)
             }
             
         }
@@ -104,6 +105,7 @@ public final class CVCalendarMonthContentViewController: CVCalendarContentViewCo
                 replaceMonthView(presented, withIdentifier: Following, animatable: false)
                 
                 insertMonthView(getPreviousMonth(previous.date), withIdentifier: Previous)
+                self.calendarView.delegate?.didShowPreviousMonthView?(previous.date)
             }
         }
     }
@@ -129,7 +131,7 @@ public final class CVCalendarMonthContentViewController: CVCalendarContentViewCo
     }
     
     public override func performedDayViewSelection(dayView: DayView) {
-        if dayView.isOut {
+        if dayView.isOut && calendarView.shouldScrollOnOutDayViewSelection {
             if dayView.date.day > 20 {
                 let presentedDate = dayView.monthView.date
                 calendarView.presentedDate = Date(date: self.dateBeforeDate(presentedDate))
